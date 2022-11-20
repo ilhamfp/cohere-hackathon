@@ -7,7 +7,7 @@ Optional: You can upload you latest exported WhatsApp chat to have a better expe
 
 Built for [Cohere Thanksgiving Hackathon](https://lablab.ai/event/cohere-thanksgiving-hackathon)
 
-<p align="center"> <img src="assets/demo1.gif" alt="sally" width="300"/> <img src="assets/demo1.gif" alt="sally" width="300"/> </p>
+<p align="center"> <img src="assets/demo.gif" alt="sally" width="250"/> </p>
 
 ## Setup
 
