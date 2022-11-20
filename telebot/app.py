@@ -40,7 +40,7 @@ def respond():
         request.get_json(force=True), bot)
 
     if update is None or update.message is None:
-        return 
+        return "ok"
 
     chat_id = update.message.chat.id
     msg_id = update.message.message_id
