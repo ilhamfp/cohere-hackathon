@@ -1,7 +1,7 @@
 import cohere
 import os
 
-from .classify import classify_text_toxicity
+from classify import classify_text_toxicity
 
 IS_DEBUG_MODE = True
 API_KEY = os.getenv("COHERE_API_KEY")
@@ -96,7 +96,7 @@ class LovedOnes:
 
     def generate_prompt(self) -> str:
         token_count = 10 + len(self.short_description.split(" ")) # Initial prompt token count
-        initial_prompt = "Generates conversation with your loved ones.\n{name} is {short_description}\n\n".format(
+        initial_prompt = "Generates conversation with your loved ones.\n{name} {short_description}\n\n".format(
             name = self.loved_ones_name,
             short_description = self.short_description,
         )
@@ -146,7 +146,7 @@ class LovedOnes:
             print("------------------------------------------")
 
         user_names = ["{}:".format(self.user_name)]
-        for name in user_names:
+        for name in self.other_names:
             user_names.append("{}:".format(name))
 
         response = co.generate(  
