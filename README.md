@@ -3,7 +3,7 @@ Reconnect with your loved ones using Sally bot!
 
 Telegram bot: [t.me/ReconnectWithSallybot](https://t.me/ReconnectWithSallybot)
 
-Optional: You can upload you latest WhatsApp chat to have a better experience. The bot will have more context.
+Optional: You can upload you latest exported WhatsApp chat to have a better experience. The bot will have more context.
 
 Built for [Cohere Thanksgiving Hackathon](https://lablab.ai/event/cohere-thanksgiving-hackathon)
 
