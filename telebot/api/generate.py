@@ -1,9 +1,26 @@
 import cohere
 import os
 
-IS_DEBUG_MODE = False
+from .classify import classify_text_toxicity
+
+IS_DEBUG_MODE = True
 API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
+
+class MessageSingle:
+    def __init__(self, name, text) -> None:
+        self.name = name
+        self.text = text
+
+    # Returns the number of token
+    def length(self) -> int:
+        return len(self.user_text.split(" ")) + self.loved_ones_text.split(" ") + 4
+
+    def to_str(self, placeholder1, placeholder2) -> str:
+        return "{user_name}: {user_text}".format(
+            user_name=self.name,
+            user_text=self.text,
+        )
 
 class Message:
     def __init__(self, user_text, loved_ones_text="") -> None:
@@ -12,30 +29,58 @@ class Message:
 
     # Returns the number of token
     def length(self) -> int:
-        return len(self.user_text.split(" ")) + self.loved_ones_text.split(" ")
+        return len(self.user_text.split(" ")) + self.loved_ones_text.split(" ") + 4
 
     def to_str(self, user_name, loved_ones_name) -> str:
-        return """
-        {user_name}: {user_text}
-        {loved_ones_name}: {loved_ones_text}
-        """.format(
+        return "{user_name}: {user_text}\n{loved_ones_name}: {loved_ones_text}".format(
             user_name=user_name,
             user_text=self.user_text,
             loved_ones_name=loved_ones_name,
             loved_ones_text=self.loved_ones_text
         )
         
+
+from datetime import datetime
+def process_whatsapp_text(text):
+    text = text.strip()
+    text_split = text.split(':')
+    try:
+        # Iphone chat export
+        user = text.split(':')[2].split(']')[1].strip()
+    except:
+        try:
+            # Android chat export
+            user = text.split('-')[1].split(':')[0].strip()
+        except:
+            # Misc chat export
+            if len(text_split) > 0:
+                user_split = text_split[0].split(" ")
+                user = user_split[-1] if len(user_split) > 0 else ""
+        
+    if len(text_split) > 0:
+        msg = text.split(':')[-1].strip()
+    else:
+        msg = ""
+    return {'user': user, 'text': msg}
+
+
 class LovedOnes:
     def __init__(self, user_name, loved_ones_name="", short_description="") -> None:
         self.user_name = user_name
+        self.other_names = []
         self.loved_ones_name = loved_ones_name
         self.short_description = short_description
-        self.latest_chat = [] # array of Messages
+        self.latest_chat = [] # array of Message/MessageSingle
         self.MAX_PROMPT_LENGTH = 1800
 
-    def upload_latest_chat(self) -> None:
-        # Read text messages from whatsapp export and fill the latest_chat arrays
-        return 
+    def upload_latest_chat(self, file_path: str) -> None:
+        # Read text messages from whatsapp export and fill the latest_chat array
+        with open(file_path, "r") as f:
+            lines = f.readlines() 
+            for line in lines:
+                res = process_whatsapp_text(line)
+                if res['text'] != "" or res['user'] != "":
+                    self.latest_chat.append(MessageSingle(res['user'], res['text']))
 
     def update_latest_chat_user(self, user_text) -> None:
         self.latest_chat.append(Message(user_text.strip()))
@@ -51,10 +96,7 @@ class LovedOnes:
 
     def generate_prompt(self) -> str:
         token_count = 10 + len(self.short_description.split(" ")) # Initial prompt token count
-        initial_prompt = """
-        Generates conversation with your loved ones.
-        {name} is a {short_description}
-        """.format(
+        initial_prompt = "Generates conversation with your loved ones.\n{name} is {short_description}\n\n".format(
             name = self.loved_ones_name,
             short_description = self.short_description,
         )
@@ -65,18 +107,17 @@ class LovedOnes:
         # Generate messages prompt starting for the latest one
         messages_prompt = ""
         messages_idx = len(self.latest_chat)-1
-        cur_messages = self.latest_chat[messages_idx].to_str(self.user_name, self.loved_ones_name)
+        cur_messages = self.latest_chat[messages_idx].to_str(self.user_name, self.loved_ones_name) + "\n"
         cur_messages_length = len(cur_messages.split(" ")) + 2
         while (token_count + cur_messages_length < self.MAX_PROMPT_LENGTH):
-            sep = "--" if messages_prompt != "" else ""
-            messages_prompt = cur_messages + sep + messages_prompt
+            messages_prompt = cur_messages + messages_prompt
             token_count += cur_messages_length
 
             messages_idx -= 1
             if messages_idx < 0:
                 break
 
-            cur_messages = self.latest_chat[messages_idx].to_str(self.user_name, self.loved_ones_name)
+            cur_messages = self.latest_chat[messages_idx].to_str(self.user_name, self.loved_ones_name) + "\n"
             cur_messages_length = len(cur_messages.split(" ")) + 2
 
         if IS_DEBUG_MODE:
@@ -85,6 +126,17 @@ class LovedOnes:
         return initial_prompt + messages_prompt
 
     def generate_response(self, msg:str) -> str:
+        resp = self._generate_response(msg)
+        pred, conf = classify_text_toxicity(resp)
+        # Prevent sending toxic message to our user.
+        while pred == "1" and conf > 0.8:
+            resp = self._generate_response(msg)
+            pred, conf = classify_text_toxicity(resp)
+
+        self.update_latest_chat_loved_ones(resp)
+        return self.latest_chat[-1].loved_ones_text
+
+    def _generate_response(self, msg:str) -> str:
         self.update_latest_chat_user(str(msg).strip())
         prompt = self.generate_prompt()
 
@@ -93,12 +145,16 @@ class LovedOnes:
             print("prompt: ", prompt)
             print("------------------------------------------")
 
+        user_names = ["{}:".format(self.user_name)]
+        for name in user_names:
+            user_names.append("{}:".format(name))
+
         response = co.generate(  
             model='xlarge',  
             prompt = prompt,  
             max_tokens=100,  
-            temperature=0.6,  
-            stop_sequences=["{}:".format(self.user_name)])
+            temperature=1,  
+            stop_sequences=user_names)
 
         resp_msg = response.generations[0].text
 
@@ -107,8 +163,7 @@ class LovedOnes:
             print("resp_msg: ", resp_msg)
             print("------------------------------------------")
 
-        self.update_latest_chat_loved_ones(resp_msg)
-        return self.latest_chat[-1].loved_ones_text
+        return resp_msg
 
 if __name__ == "__main__":
     # Run this file to test the API in CLI!
