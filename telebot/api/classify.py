@@ -3,7 +3,7 @@ from cohere.classify import Example
 import os
 from typing import Tuple
 
-IS_DEBUG_MODE = False
+IS_DEBUG_MODE = True
 API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
 
