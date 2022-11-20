@@ -1,1 +1,1 @@
-web: gunicorn --chdir telebot app:app --bind 0.0.0.0:9000
+web: gunicorn --chdir telebot app:app
