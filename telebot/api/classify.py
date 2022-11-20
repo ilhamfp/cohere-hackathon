@@ -13,7 +13,10 @@ def classify_text_toxicity(msg: str) -> Tuple[str, float]:
     inputs=[msg])
 
     if IS_DEBUG_MODE:
+        print("----------classify_text_toxicity--------")
+        print("msg: ", msg)
         print("classify_text_toxicity response: ", resp)
+        print("----------------------------------------")
     return resp[0].prediction, resp[0].confidence
 
 if __name__ == "__main__":
