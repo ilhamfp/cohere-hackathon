@@ -46,7 +46,7 @@ class LovedOnes:
 
         if IS_DEBUG_MODE:
             print("Trimmed text: ", trimmed_text)
-            
+
         self.latest_chat[-1].loved_ones_text = trimmed_text
 
     def generate_prompt(self) -> str:
@@ -84,10 +84,34 @@ class LovedOnes:
 
         return initial_prompt + messages_prompt
 
-user_loved_ones = {}
+    def generate_response(self, msg:str) -> str:
+        self.update_latest_chat_user(str(msg).strip())
+        prompt = self.generate_prompt()
 
+        if IS_DEBUG_MODE:
+            print("------------------------------------------")
+            print("prompt: ", prompt)
+            print("------------------------------------------")
+
+        response = co.generate(  
+            model='xlarge',  
+            prompt = prompt,  
+            max_tokens=100,  
+            temperature=0.6,  
+            stop_sequences=["{}:".format(self.user_name)])
+
+        resp_msg = response.generations[0].text
+
+        if IS_DEBUG_MODE:
+            print("------------------------------------------")
+            print("resp_msg: ", resp_msg)
+            print("------------------------------------------")
+
+        self.update_latest_chat_loved_ones(resp_msg)
+        return self.latest_chat[-1].loved_ones_text
 
 if __name__ == "__main__":
+    # Run this file to test the API in CLI!
     print("Welcome to Sally bot!")
     print("What's your name?")
     user_name = input("Your name: ")
@@ -100,30 +124,8 @@ if __name__ == "__main__":
     lo.short_description = short_description
     # print("Can you upload your latest chat with them?")
     # input_latest_chat = input("Input whatsapp exported chat: ")
-    print("Thanks! You can start chatting now.")
+    print("Thanks! You can start chatting now.\n")
     while 1:
-        msg = input("Input you message: ")
-        lo.update_latest_chat_user(str(msg).strip())
-        prompt = lo.generate_prompt()
-
-        if IS_DEBUG_MODE:
-            print("------------------------------------------")
-            print("prompt: ", prompt)
-            print("------------------------------------------")
-
-        response = co.generate(  
-            model='xlarge',  
-            prompt = prompt,  
-            max_tokens=100,  
-            temperature=0.6,  
-            stop_sequences=["{}:".format(lo.user_name)])
-
-        resp_msg = response.generations[0].text
-
-        if IS_DEBUG_MODE:
-            print("------------------------------------------")
-            print("resp_msg: ", resp_msg)
-            print("------------------------------------------")
-
-        lo.update_latest_chat_loved_ones(resp_msg)
-        print("{}: {}".format(lo.loved_ones_name, lo.latest_chat[-1].loved_ones_text))
+        msg = input("{}: ".format(user_name))
+        resp = lo.generate_response(msg)
+        print("{}: {}".format(lo.loved_ones_name, resp))
