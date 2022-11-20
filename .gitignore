@@ -1,3 +1,4 @@
+**/*.txt
 **/*.csv
 **/*.zip
 **/.DS_Store
@@ -131,3 +132,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+!corpus/sample_whatsapp_chat.txt
+!corpus/sample_whatsapp_chat.zip

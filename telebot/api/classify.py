@@ -8,22 +8,12 @@ API_KEY = os.getenv("COHERE_API_KEY")
 co = cohere.Client(API_KEY)
 
 def classify_text_toxicity(msg: str) -> Tuple[str, float]:
-    resp = co.classify( 
-    model='large', 
-    inputs=[msg], 
-    examples=[
-        Example("yo how are you", "benign"), 
-        Example("PUDGE MID!", "benign"), 
-        Example("I would buy this again", "benign"), 
-        Example("I think I saw it first", "benign"), 
-        Example("bring me a potion", "benign"), 
-        Example("The order is 5 days late", "benign"), 
-        Example("I will honestly kill you", "toxic"), 
-        Example("get rekt moron", "toxic"), 
-        Example("go to hell", "toxic"), 
-        Example("you are hot trash", "toxic")]
-    ) 
-    print(resp)
+    resp = co.classify(
+    model='0a833c24-9927-48ce-8910-014c37e86344-ft',
+    inputs=[msg])
+
+    if IS_DEBUG_MODE:
+        print("classify_text_toxicity response: ", resp)
     return resp[0].prediction, resp[0].confidence
 
 if __name__ == "__main__":
@@ -32,3 +22,4 @@ if __name__ == "__main__":
         msg = input("Text to classify: ")
         pred, conf = classify_text_toxicity(msg)
         print("Response: {} ({})".format(pred, conf))
+
