@@ -121,7 +121,7 @@ def respond():
                     text=resp)
 
             except Exception as e:
-                print("Got an exception: ", e)
+                print("Got an exception 2: ", e)
                 # if things went wrong
                 bot.sendMessage(
                     chat_id=chat_id, 
@@ -146,7 +146,7 @@ def respond():
             user_loved_ones[chat_id].upload_latest_chat(extracted_path)
             user_state[chat_id] = 4
         except Exception as e:
-                print("Got an exception: ", e)
+                print("Got an exception 1: ", e)
                 # if things went wrong
                 bot.sendMessage(
                     chat_id=chat_id, 

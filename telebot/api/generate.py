@@ -101,8 +101,9 @@ class LovedOnes:
             short_description = self.short_description,
         )
 
-        if len(self.latest_chat) == 0:
+        if (len(self.latest_chat) == 0) or (len(self.latest_chat) == 1 and self.latest_chat[0].loved_ones_text == ""):
             self.latest_chat.append(Message("Hello!", "Hello!"))
+            self.latest_chat.append(Message("Have you seen the news?", "No I have not."))
 
         # Generate messages prompt starting for the latest one
         messages_prompt = ""
