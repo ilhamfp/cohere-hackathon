@@ -13,7 +13,6 @@ bot = telegram.Bot(token=TOKEN)
 
 # start the flask app
 app = Flask(__name__)
-demo_count = 0
 
 # user_state store the state of user onboarding process.
 # Each user has 5 onboarding steps
@@ -75,7 +74,7 @@ def respond():
         else:
             try:
                 if user_state[chat_id] == 1:
-                    msg = "Let's talk to {name}! Can you provide a short description about them?\nFinish this sentence.\n\n{name} is...".format(
+                    msg = "Let's talk to {name}! Can you provide a short description about them?\nFinish this sentence.\n\n{name}...".format(
                                 name=text
                             )
                     user_state[chat_id] = 2
@@ -116,7 +115,6 @@ def respond():
                     text=msg)
 
                 elif user_state[chat_id] == 4:
-
                     resp = user_loved_ones[chat_id].generate_response(text)
                     bot.sendMessage(
                     chat_id=chat_id, 
