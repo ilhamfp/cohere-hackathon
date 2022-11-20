@@ -7,6 +7,8 @@ Optional: You can upload you latest exported WhatsApp chat to have a better expe
 
 Built for [Cohere Thanksgiving Hackathon](https://lablab.ai/event/cohere-thanksgiving-hackathon)
 
+<p align="center"> <img src="assets/demo1.gif" alt="sally" width="300"/> <img src="assets/demo1.gif" alt="sally" width="300"/> </p>
+
 ## Setup
 
 1. Install all the requirement in `requirements.txt`
@@ -31,4 +33,7 @@ Built for [Cohere Thanksgiving Hackathon](https://lablab.ai/event/cohere-thanksg
 
 ## What Happen on Each Message?
 
-<p align="center"> <img src="assets/diagram.png" alt="Sally technical diagram" width="750"/> 
+<p align="center"> <img src="assets/diagram.png" alt="Sally technical diagram" width="750"/> </p>
+
+* Checkout [/telebot/api/generate.py](/telebot/api/generate.py) to learn more about how we use Cohere's Generate API
+* Checkout [/telebot/api/classify.py](/telebot/api/classify.py) to learn more about how we use Cohere's Classify API
