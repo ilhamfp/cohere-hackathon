@@ -1,7 +1,7 @@
 import cohere
 import os
 
-from classify import classify_text_toxicity
+from .classify import classify_text_toxicity
 
 IS_DEBUG_MODE = True
 API_KEY = os.getenv("COHERE_API_KEY")
