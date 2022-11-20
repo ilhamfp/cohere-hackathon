@@ -1,3 +1,4 @@
-bot_token = "5647877415:AAEt8vDcJ4oGdF3d-SVp5SMEzVy-e2Ld360"
-bot_user_name = "ReconnectWithSallybot"
-URL = "https://e2b2-118-136-126-128.ap.ngrok.io"
+import os
+bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+bot_user_name = os.getenv('TELEGRAM_BOT_USER_NAME')
+URL = os.getenv('TELEGRAM_BOT_WEBHOOK_URL')
