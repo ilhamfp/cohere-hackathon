@@ -33,7 +33,7 @@ Built for [Cohere Thanksgiving Hackathon](https://lablab.ai/event/cohere-thanksg
 
 ## What Happen on Each Message?
 
-<p align="center"> <img src="assets/diagram.png" alt="Sally technical diagram" width="750"/> </p>
+<p align="center"> <img src="assets/diagram2.png" alt="Sally technical diagram" width="750"/> </p>
 
 * Checkout [/telebot/api/generate.py](/telebot/api/generate.py) to learn more about how we use Cohere's Generate API
 * Checkout [/telebot/api/classify.py](/telebot/api/classify.py) to learn more about how we use Cohere's Classify API
